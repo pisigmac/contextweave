@@ -116,10 +116,6 @@ class WeaveSyncService:
 
             db.commit()
 
-            # Resolve references
-            graph = GraphEngine(db)
-            graph.resolve_references(str(weave_file.id))
-
             return len(parsed.entries)
 
         except Exception as e:
@@ -155,6 +151,18 @@ class WeaveSyncService:
                     count += 1
                 except Exception as e:
                     print(f"Error syncing {file_path}: {e}")
+
+        # SECOND PASS: resolve cross-file references after all files are in DB
+        db = SessionLocal()
+        try:
+            graph = GraphEngine(db)
+            for weave_file in db.query(WeaveFile).all():
+                graph.resolve_references(str(weave_file.id))
+        except Exception as e:
+            print(f"Error resolving references: {e}")
+        finally:
+            db.close()
+
         return count
 
     def start(self) -> None:
