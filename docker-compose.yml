@@ -5,7 +5,7 @@ services:
     build: .
     container_name: weave-api
     ports:
-      - "8000:8000"
+      - "58000:8000"
     environment:
       - WEAVE_DATABASE_URL=sqlite:///data/weave.db
       - WEAVE_WORKSPACE_DIR=/workspace
